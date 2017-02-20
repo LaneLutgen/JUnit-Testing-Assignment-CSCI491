@@ -194,6 +194,7 @@ public class Customer_test {
 	@Test
 	public void getParticipationGroups_test()
 	{
-		
+		System.out.println("Testing getCostToPay...");
+		setupDB() ;
 	}
 }
