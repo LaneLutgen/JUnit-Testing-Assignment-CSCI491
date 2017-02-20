@@ -19,12 +19,12 @@ public class Customer_test {
 		assertTrue(C.getCostToPay() == 0) ; 
 	}
 	
-	@Test
-	public void test2() { 
-		System.out.println("Provide a short description...") ;
-		// an example of test that fails, in this case trivially:
-		assertTrue(1/0 == 0) ;
-	}
+//	@Test
+//	public void test2() { 
+//		System.out.println("Provide a short description...") ;
+//		// an example of test that fails, in this case trivially:
+//		assertTrue(1/0 == 0) ;
+//	}
 	
 	
 	// and so on ...
@@ -59,9 +59,9 @@ public class Customer_test {
 	 * 
 	 */
 	@Test
-	public void getDiscountValue_DiscountApplicable()
+	public void getDiscountValue_DiscountApplicable1000()
 	{
-		System.out.println("Testing getDiscountValue with applicable input...");
+		System.out.println("Testing getDiscountValue for Discount_1000 with applicable input...");
 		setupDB() ;
 		
 		int input = 500000;
@@ -86,9 +86,9 @@ public class Customer_test {
 	 * 
 	 */
 	@Test
-	public void getDiscountValue_DiscountNotApplicable()
+	public void getDiscountValue_DiscountNotApplicable1000()
 	{
-		System.out.println("Testing getDiscountValue with non-applicable input...");
+		System.out.println("Testing getDiscountValue for Discount_1000 with non-applicable input...");
 		setupDB() ;
 		
 		ApplicationLogic app = new ApplicationLogic();
@@ -105,13 +105,90 @@ public class Customer_test {
 		assertTrue(value == 0);
 	}
 	
+	/*
+	 * 
+	 */
+	@Test
+	public void getDiscountValue_DiscountApplicable5pack()
+	{
+		System.out.println("Testing getDiscountValue for Discount_5pack with applicable input");
+		setupDB() ;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		
+		int personID = app.addCustomer("Person", "");
+		int serviceOneID = app.addService("Shop", 10000);
+		int serviceTwoID = app.addService("Shop2", 20000);
+		int serviceThreeID = app.addService("Shop3", 30000);
+		int serviceFourID = app.addService("Shop4", 40000);
+		int serviceFiveID = app.addService("Shop5", 50000);
+		app.addParticipation(personID, serviceOneID);
+		app.addParticipation(personID, serviceTwoID);
+		app.addParticipation(personID, serviceThreeID);
+		app.addParticipation(personID, serviceFourID);
+		app.addParticipation(personID, serviceFiveID);
+		app.awardDiscount(personID, ApplicationLogic.D5p);
+		
+		Customer C = app.findCustomer(personID);
+		
+		int value = C.getDiscountValue();
+		
+		//This test fails because Discount_5pack is not expressed in euro cents
+		assertTrue(value == 10000);
+	}
 	
+	/*
+	 * 
+	 */
+	@Test
+	public void getDiscountValue_DiscountNotApplicable5pack()
+	{
+		System.out.println("Testing getDiscountValue for Discount_5pack with non applicable input");
+		setupDB() ;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		
+		int personID = app.addCustomer("Person", "");
+		int serviceOneID = app.addService("Shop", 10000);
+		int serviceTwoID = app.addService("Shop2", 20000);
+		int serviceThreeID = app.addService("Shop3", 30000);
+		int serviceFourID = app.addService("Shop4", 40000);
+		app.addParticipation(personID, serviceOneID);
+		app.addParticipation(personID, serviceTwoID);
+		app.addParticipation(personID, serviceThreeID);
+		app.addParticipation(personID, serviceFourID);
+		app.awardDiscount(personID, ApplicationLogic.D5p);
+		
+		Customer C = app.findCustomer(personID);
+		
+		int value = C.getDiscountValue();
+		
+		assertTrue(value == 0);
+	}
 	
 	
 	@Test
 	public void getCostToPay_test()
 	{
+		System.out.println("Testing getCostToPay...");
+		setupDB() ;
 		
+		int input = 500000;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		
+		int personID = app.addCustomer("Person", "");
+		int serviceID = app.addService("Shop", input);
+		app.addParticipation(personID, serviceID);
+		app.awardDiscount(personID, ApplicationLogic.D1000);
+		
+		Customer C = app.findCustomer(personID);
+		
+		int actualValue = C.getCostToPay();
+		
+		int expectedValue = C.participationValue() - C.getDiscountValue();
+		
+		assertTrue(actualValue == expectedValue);
 	}
 	
 	@Test
