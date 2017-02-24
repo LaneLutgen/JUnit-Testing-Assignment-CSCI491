@@ -2,6 +2,9 @@ package Participation;
 import org.junit.* ;
 import static org.junit.Assert.* ;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * This is just a simple template for Junit test-class for testing
  * the class ApplicationLogic. Testing this class is a bit more
@@ -103,7 +106,25 @@ public class ApplicationLogic_test {
 	}
 	
 	@Test
-	public void removeService_NoServices() {
+	public void removeService_RemoveServiceNotTiedToParticipation() {
+		setupDB() ;
+		ApplicationLogic SUT = new ApplicationLogic() ;
+		
+		System.out.println("Testing removeService...") ;
+		
+		int duffyID = SUT.addCustomer("Duffy Duck", "") ;
+		int otherServiceID = SUT.addService("Other", 300);
+		
+		SUT.removeService(otherServiceID);
+		
+		Customer C = SUT.findCustomer(duffyID) ;
+
+		//Service is not removed
+		assertTrue(C.getServices().size() == 0) ;
+	}
+	
+	@Test
+	public void removeService_InvalidServiceID() {
 		setupDB() ;
 		ApplicationLogic SUT = new ApplicationLogic() ;
 		
@@ -113,16 +134,61 @@ public class ApplicationLogic_test {
 		int otherServiceID = SUT.addService("Other", 300);
 		SUT.addParticipation(duffyID, otherServiceID) ;
 		
+		//Try to remove invalid service ID
 		SUT.removeService(1000);
 		
 		Customer C = SUT.findCustomer(duffyID) ;
 
-		assertTrue(C.getServices().size() == 0) ;
+		//Service is not removed
+		assertTrue(C.getServices().size() == 1) ;
 	}
 	
 	@Test
-	public void resolve_test() {
+	public void resolve_ApplicableDiscount() {		
+		System.out.println("Testing resolve()...");
 		setupDB() ;
 		
+		int input = 500000;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		
+		int personID = app.addCustomer("Person", "");
+		int serviceID = app.addService("Shop", input);
+		app.addParticipation(personID, serviceID);
+		app.awardDiscount(personID, ApplicationLogic.D1000);
+		
+		Map<Customer, Integer> payment = app.resolve();
+		
+		Collection<Integer> values = payment.values();
+		
+		for(Integer val : values)
+		{
+			//Payment after discount is applied
+			assertTrue(val == 475000);
+		}
+	}
+	
+	@Test
+	public void resolve_NonApplicableDiscount() {		
+		System.out.println("Testing resolve() with non-applicable discount...");
+		setupDB() ;
+		
+		int input = 500;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		
+		int personID = app.addCustomer("Person", "");
+		int serviceID = app.addService("Shop", input);
+		app.addParticipation(personID, serviceID);
+		app.awardDiscount(personID, ApplicationLogic.D1000);
+		
+		Map<Customer, Integer> payment = app.resolve();
+		
+		Collection<Integer> values = payment.values();
+		
+		for(Integer val : values)
+		{
+			assertTrue(val == 500);
+		}
 	}
 }

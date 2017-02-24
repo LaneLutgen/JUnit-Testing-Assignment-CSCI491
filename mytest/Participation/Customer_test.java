@@ -31,6 +31,30 @@ public class Customer_test {
 //		assertTrue(1/0 == 0) ;
 //	}
 	
+	/*
+	 * This test creates a Customer with 2 services of $25 and $50
+	 * 
+	 * Expected Result: Total participation value is $75
+	 */
+	@Test
+	public void getParticipationValue_OneService()
+	{
+		System.out.println("Testing getParticipationValue...");
+		setupDB() ;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		
+		int personID = app.addCustomer("Person", "");
+		int serviceID = app.addService("Shop", 25);
+		app.addParticipation(personID, serviceID);
+		
+		Customer C = app.findCustomer(personID);
+		
+		int value = C.participationValue();
+		
+		assertTrue(value == 25);
+	}
+	
 	
 	// and so on ...
 	
@@ -40,7 +64,7 @@ public class Customer_test {
 	 * Expected Result: Total participation value is $75
 	 */
 	@Test
-	public void getParticipationValue_test()
+	public void getParticipationValue_MultipleServices()
 	{
 		System.out.println("Testing getParticipationValue...");
 		setupDB() ;

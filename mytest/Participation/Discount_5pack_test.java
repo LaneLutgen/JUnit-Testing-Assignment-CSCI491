@@ -45,6 +45,72 @@ public class Discount_5pack_test {
 	}
 	
 	@Test
+	public void applicable_ValuesNotInEuroCents_ReturnsFalse() 
+	{
+		System.out.println("Testing getDiscountValue for Discount_5pack with applicable input");
+		setupDB() ;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		
+		int personID = app.addCustomer("Person", "");
+		int serviceOneID = app.addService("Shop", 100);
+		int serviceTwoID = app.addService("Shop2", 200);
+		int serviceThreeID = app.addService("Shop3", 300);
+		int serviceFourID = app.addService("Shop4", 400);
+		int serviceFiveID = app.addService("Shop5", 500);
+		app.addParticipation(personID, serviceOneID);
+		app.addParticipation(personID, serviceTwoID);
+		app.addParticipation(personID, serviceThreeID);
+		app.addParticipation(personID, serviceFourID);
+		app.addParticipation(personID, serviceFiveID);
+		app.awardDiscount(personID, ApplicationLogic.D5p);
+		
+		Customer C = app.findCustomer(personID);
+		Set<Discount> discounts = C.getDiscounts();
+		
+		int value = C.getDiscountValue();
+		
+		for (Discount D : discounts)
+		{
+			assertFalse(D.applicable(C));
+			//******
+			System.out.println("TEST FAILED: Values are not expressed as euro-cents");
+		}
+	}
+	
+	@Test
+	public void applicable_PartValTooLow_ReturnsFalse() 
+	{
+		System.out.println("Testing getDiscountValue for Discount_5pack with applicable input");
+		setupDB() ;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		
+		int personID = app.addCustomer("Person", "");
+		int serviceOneID = app.addService("Shop", 1);
+		int serviceTwoID = app.addService("Shop2", 20000);
+		int serviceThreeID = app.addService("Shop3", 30000);
+		int serviceFourID = app.addService("Shop4", 40000);
+		int serviceFiveID = app.addService("Shop5", 50000);
+		app.addParticipation(personID, serviceOneID);
+		app.addParticipation(personID, serviceTwoID);
+		app.addParticipation(personID, serviceThreeID);
+		app.addParticipation(personID, serviceFourID);
+		app.addParticipation(personID, serviceFiveID);
+		app.awardDiscount(personID, ApplicationLogic.D5p);
+		
+		Customer C = app.findCustomer(personID);
+		Set<Discount> discounts = C.getDiscounts();
+		
+		int value = C.getDiscountValue();
+		
+		for (Discount D : discounts)
+		{
+			assertFalse(D.applicable(C));
+		}
+	}
+	
+	@Test
 	public void applicable_ReturnsFalse() 
 	{
 		System.out.println("Testing getDiscountValue for Discount_5pack with applicable input");
@@ -101,6 +167,7 @@ public class Discount_5pack_test {
 		for (Discount D : discounts)
 		{
 			assertTrue(D.calcDiscount(C) == 10000);
+			System.out.println("TEST FAILED: calcDiscount test is failing for 5pack because values are not expressed in euro cents");
 		}
 	}
 }
