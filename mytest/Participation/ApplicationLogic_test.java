@@ -64,4 +64,65 @@ public class ApplicationLogic_test {
 		assertTrue(C.getCostToPay() == 200) ;
 	}
 	
+	@Test
+	public void removeService_ServiceIsRemovedSuccessfully() {
+		setupDB() ;
+		ApplicationLogic SUT = new ApplicationLogic() ;
+		
+		System.out.println("Testing removeService...") ;
+		
+		int duffyID = SUT.addCustomer("Duffy Duck", "") ;
+		int flowerServiceID = SUT.addService("Flowers online shop", 100);
+		SUT.addParticipation(duffyID, flowerServiceID) ;
+		
+		SUT.removeService(flowerServiceID);
+		
+		Customer C = SUT.findCustomer(duffyID) ;
+
+		assertTrue(C.getServices().isEmpty()) ;
+	}
+	
+	@Test
+	public void removeService_MultipleServices() {
+		setupDB() ;
+		ApplicationLogic SUT = new ApplicationLogic() ;
+		
+		System.out.println("Testing removeService...") ;
+		
+		int duffyID = SUT.addCustomer("Duffy Duck", "") ;
+		int flowerServiceID = SUT.addService("Flowers online shop", 100);
+		int otherServiceID = SUT.addService("Other", 300);
+		SUT.addParticipation(duffyID, flowerServiceID) ;
+		SUT.addParticipation(duffyID, otherServiceID) ;
+		
+		SUT.removeService(flowerServiceID);
+		
+		Customer C = SUT.findCustomer(duffyID) ;
+
+		assertTrue(C.getServices().size() == 1) ;
+	}
+	
+	@Test
+	public void removeService_NoServices() {
+		setupDB() ;
+		ApplicationLogic SUT = new ApplicationLogic() ;
+		
+		System.out.println("Testing removeService...") ;
+		
+		int duffyID = SUT.addCustomer("Duffy Duck", "") ;
+		int otherServiceID = SUT.addService("Other", 300);
+		SUT.addParticipation(duffyID, otherServiceID) ;
+		
+		SUT.removeService(1000);
+		
+		Customer C = SUT.findCustomer(duffyID) ;
+
+		assertTrue(C.getServices().size() == 0) ;
+	}
+	
+	@Test
+	public void resolve_test() {
+		setupDB() ;
+		
+	}
 }

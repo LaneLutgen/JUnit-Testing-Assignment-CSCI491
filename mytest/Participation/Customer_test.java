@@ -1,6 +1,11 @@
 package Participation;
 import org.junit.* ;
+
+import Participation.Customer.ServiceInfo;
+
 import static org.junit.Assert.* ;
+
+import java.util.Map;
 
 /**
  * This is just a simple template for a JUnit test-class for testing 
@@ -192,9 +197,49 @@ public class Customer_test {
 	}
 	
 	@Test
-	public void getParticipationGroups_test()
+	public void getParticipationGroups_ServiceInfoNotNull()
 	{
-		System.out.println("Testing getCostToPay...");
+		System.out.println("Testing getParticipationGroups service info present...");
 		setupDB() ;
+		
+		int input = 500000;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		int personID = app.addCustomer("Person", "");
+		int serviceID = app.addService("Shop", input);
+		app.addParticipation(personID, serviceID);
+		
+		Customer C = app.findCustomer(personID);
+		
+		Map<Service, ServiceInfo> result = C.getParticipationGroups();
+		
+		for(ServiceInfo info : result.values())
+		{
+			assertTrue(info.totalParticipationValue == input);
+		}
+	}
+	
+	@Test
+	public void getParticipationGroups_DuplicateParticipation()
+	{
+		System.out.println("Testing getParticipationGroups service info present...");
+		setupDB() ;
+		
+		int input = 500000;
+		
+		ApplicationLogic app = new ApplicationLogic();
+		int personID = app.addCustomer("Person", "");
+		int serviceID = app.addService("Shop", input);
+		app.addParticipation(personID, serviceID);
+		app.addParticipation(personID, serviceID);
+		
+		Customer C = app.findCustomer(personID);
+		
+		Map<Service, ServiceInfo> result = C.getParticipationGroups();
+		
+		for(ServiceInfo info : result.values())
+		{
+			assertTrue(info.totalParticipationValue == input + input);
+		}
 	}
 }
